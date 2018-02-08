@@ -6,24 +6,30 @@ class BinaryLambdaEllipticCurve:
         self.a = a
         self.b = b
         self.n = n
-        self.polynomial = polynomial
         self.modularArithmetic = BinaryModularArithmetic(n, polynomial)
 
-    def findY(self, x):
-        yFound = -1
-        for y in range(1, self.polynomial - 1):
-            ySquare = self.modularArithmetic.square(y)
-            xSquare = self.modularArithmetic.square(x)
-            xCube = self.modularArithmetic.multiply(xSquare, x)
-            xy = self.modularArithmetic.multiply(x, y)
-            axSquare = self.modularArithmetic.multiply(self.a, xSquare)
-            left = self.modularArithmetic.add(ySquare, xy)
-            right = self.modularArithmetic.add(xCube, axSquare)
-            right = self.modularArithmetic.add(right, self.b)
-            if (left == right):
-                yFound = y
+    def findPoint(self, xFrom): 
+        xFound = -1
+        yFound = -1 
+        limit = self.modularArithmetic.getPrimitive() - 1
+        for x in range(xFrom, limit):
+            for y in range(1, limit): 
+                print(x, y)
+                ySquare = self.modularArithmetic.square(y) 
+                xSquare = self.modularArithmetic.square(x) 
+                xCube = self.modularArithmetic.multiply(xSquare, x) 
+                xy = self.modularArithmetic.multiply(x, y) 
+                axSquare = self.modularArithmetic.multiply(self.a, xSquare) 
+                left = self.modularArithmetic.add(ySquare, xy) 
+                right = self.modularArithmetic.add(xCube, axSquare) 
+                right = self.modularArithmetic.add(right, self.b) 
+                if (left == right): 
+                    yFound = y 
+                    break 
+            if (yFound):
+                xFound = x
                 break
-        return yFound
+        return xFound, yFound 
 
     def multiplyProjectivePoint(self, k, Xp, Lp, Zp):
         # TODO: Duzeltilecek (soldan sağa olacak şekilde değiştirlecek) (multiplyProjectivePoint2)

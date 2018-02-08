@@ -1,9 +1,22 @@
+import functools
+
 class BinaryModularArithmetic:
 
-    def __init__(self, m, primitive):
+    def __init__(self, m, polynomial):
         self.m = m
         self.limit = 1 << m
-        self.primitive = primitive
+        self.primitive = self.findPrimitive(m, polynomial)
+
+    def getPrimitive(self):
+        return self.primitive
+
+    def findPrimitive(self, m, polynomial):
+        binaryPolynomial = [0] * (m + 1)
+        for index in polynomial:
+            binaryPolynomial[index] = 1
+        binaryPolynomial.reverse()
+        temp = map(lambda a, b: a << b, binaryPolynomial, range(len(binaryPolynomial) - 1, -1, -1))
+        return functools.reduce(lambda a, b: a | b, temp)
 
     def degree(self, a):
         return a.bit_length()
@@ -15,8 +28,8 @@ class BinaryModularArithmetic:
         return c
 
     def add(self, a, b):
-        c = a ^ b
-        return c
+        c = a + b
+        return self.reduce(c)
     
     def subtract(self, a, b):
         c = self.add(a, b)
@@ -27,7 +40,6 @@ class BinaryModularArithmetic:
         return c
 
     def multiply(self, a, b):
-        mask = self.limit - 1
         c = 0
         while (b):
             if (b & 1):
@@ -36,17 +48,6 @@ class BinaryModularArithmetic:
             a = self.reduce(a)
             b = b >> 1
         c = self.reduce(c)
-        return c
-
-    def multiply2(self, a, b):
-        c = 0
-        mask = 1 << (self.limit - 1)
-        for i in range(b.bit_length() - 1, 0):
-            c = c << 1
-            c = self.reduce(c)
-            if (b & mask):
-                c = c ^ a
-            b = b << 1
         return c
 
     def divide(self, a, b):
